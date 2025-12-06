@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-Notes - As tuas notas, rápidas e seguras</title>
+    <style>
+        /* --- Variáveis e Reset --- */
+        :root {
+            --primary: #007bff;         /* Azul Go/Fiber */
+            --primary-dark: #0056b3;
+            --secondary: #6c757d;
+            --bg-light: #f8f9fa;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--white);
+        }
+
+        /* --- Utilitários --- */
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        a { text-decoration: none; }
+
+        /* --- Botões --- */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .btn-outline {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* --- Header / Navbar --- */
+        header {
+            padding: 20px 0;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a.login-link {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .nav-links a.login-link:hover { color: var(--primary); }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding-top: 140px;
+            padding-bottom: 80px;
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 480px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* --- Visual da App (Mockup feito com CSS) --- */
+        .app-preview {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+            transition: transform 0.5s ease;
+        }
+
+        .app-preview:hover {
+            transform: perspective(1000px) rotateY(0) rotateX(0);
+        }
+
+        .fake-browser-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f57; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #28c940; }
+
+        .fake-note {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .fake-note h4 { font-size: 0.9rem; margin-bottom: 5px; color: #555; }
+        .fake-note .line { height: 8px; background: #e9ecef; border-radius: 4px; width: 80%; }
+        .fake-note .line.short { width: 50%; margin-top: 8px; }
+
+        /* --- Features Section --- */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .section-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 40px;
+            border-radius: var(--radius);
+            background: var(--white);
+            border: 1px solid #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border-color: transparent;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 123, 255, 0.1);
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+        }
+
+        .feature-card h3 { margin-bottom: 15px; }
+        .feature-card p { color: var(--text-muted); }
+
+        /* --- Footer --- */
+        footer {
+            background: #f8f9fa;
+            padding: 60px 0 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 30px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 { font-size: 2.5rem; }
+            .hero-content p { margin: 0 auto 30px; }
+            
+            .cta-group { justify-content: center; }
+
+            .app-preview {
+                margin-top: 40px;
+                transform: none;
+            }
+
+            .nav-links .btn { display: none; } /* Simplificação mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">
+                    <!-- Ícone SVG Simples -->
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Go-Notes
+                </a>
+                <div class="nav-links">
+                    <a href="/app/login" class="login-link">Entrar</a>
+                    <a href="/app/register" class="btn btn-primary">Criar Conta</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <h1>Captura as tuas ideias num piscar de olhos.</h1>
+                    <p>Simples, rápido e seguro. O Go-Notes é a ferramenta minimalista para guardares o que importa, construída com a robustez do Go.</p>
+                    <div class="cta-group">
+                        <a href="/app/register" class="btn btn-primary">Começar Grátis</a>
+                        <a href="/app/login" class="btn btn-outline">Tenho conta</a>
+                    </div>
+                </div>
+
+                <!-- Mockup Visual (Pure CSS) -->
+                <div class="app-preview">
+                    <div class="fake-browser-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="fake-body">
+                        <div style="margin-bottom: 20px; font-weight: bold; color: #333;">As Minhas Notas</div>
+                        
+                        <!-- Nota 1 -->
+                        <div class="fake-note">
+                            <h4>Ideia para o Projeto de Docker</h4>
+                            <div class="line"></div>
+                            <div class="line short"></div>
+                        </div>
+
+                        <!-- Nota 2 -->
+                        <div class="fake-note" style="border-left-color: #28a745;">
+                            <h4>Lista de Compras</h4>
+                            <div class="line"></div>
+                        </div>
+
+                        <!-- Nota 3 -->
+                        <div class="fake-note" style="border-left-color: #ffc107;">
+                            <h4>Aprender Go Fiber</h4>
+                            <div class="line"></div>
+                            <div class="line short"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Porquê usar o Go-Notes?</h2>
+                <p>Focámo-nos no essencial para que te foques no que importa.</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <h3>Performance Extrema</h3>
+                    <p>Construído em Go, o backend é incrivelmente rápido e leve, garantindo que as tuas notas carregam instantaneamente.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3>Segurança Garantida</h3>
+                    <p>As tuas palavras-passe são encriptadas com BCrypt e os dados guardados numa base de dados PostgreSQL robusta.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3>Deployment Simples</h3>
+                    <p>Podes correr esta aplicação em qualquer lugar, desde o teu portátil até à cloud.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <strong style="font-size: 1.2rem;">Go-Notes</strong>
+                    <p style="color: #6c757d; font-size: 0.9rem; margin-top: 10px;">Feito para aprender Sistemas Operativos.</p>
+                </div>
+                <div>
+                    <a href="/app/login" style="color: var(--text-muted); margin-right: 20px;">Login</a>
+                    <a href="/app/register" style="color: var(--text-muted);">Registo</a>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Go-Notes App. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

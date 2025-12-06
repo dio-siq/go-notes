@@ -40,8 +40,7 @@ func main() {
 
 	// --- ROTAS ---
 	app.Get("/", func(c *fiber.Ctx) error {
-		//return c.Redirect("/app/login")
-		return c.Render("templates/index", nil)
+		return c.Redirect("/app/login")
 	})
 
 	api := app.Group("/app")
