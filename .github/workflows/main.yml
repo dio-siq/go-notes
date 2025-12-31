@@ -75,17 +75,15 @@ jobs:
     - name: Setup SSH for deployment
       env:
         SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-        SSH_HOST: ${{ secrets.VM_HOST }}
-        SSH_USER: ${{ secrets.VM_USER }}
       run: |
         mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        
-        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-        
-        echo "Testando conexão SSH com $SSH_HOST"
-        ssh -o ConnectTimeout=10 $SSH_USER@$SSH_HOST "echo 'SSH connection successful'"
+    
+        ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+    
+        echo "Testando conexão SSH com ${{ secrets.VM_HOST }}"
+        ssh -o ConnectTimeout=10 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}
     
     - name: Deploy to VM
       env:
