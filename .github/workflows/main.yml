@@ -80,10 +80,18 @@ jobs:
         echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
     
-        ssh-keyscan -H ${{ secrets.VM_SSH_HOST }} >> ~/.ssh/known_hosts
+        echo "Host provided: '${{ secrets.VM_SSH_HOST }}' (length $(echo -n '${{ secrets.VM_SSH_HOST }}' | wc -c))"
+    
+        if [ -z "${{ secrets.VM_SSH_HOST }}" ]; then
+          echo "Error: VM_SSH_HOST is empty - check repository secrets!"
+          exit 1
+        fi
+    
+        ssh-keyscan -H "${{ secrets.VM_SSH_HOST }}" >> ~/.ssh/known_hosts || { echo "ssh-keyscan failed"; exit 1; }
     
         echo "Testando conexão SSH com ${{ secrets.VM_SSH_HOST }}"
-        ssh -o ConnectTimeout=10 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }}
+        ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new \
+          ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} "echo 'SSH OK'"
     
     - name: Deploy to VM
       env:
