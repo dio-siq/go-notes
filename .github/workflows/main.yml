@@ -87,7 +87,7 @@ jobs:
           exit 1
         fi
     
-        ssh-keyscan -H "${{ secrets.VM_SSH_HOST }}" >> ~/.ssh/known_hosts || { echo "ssh-keyscan failed"; exit 1; }
+        ssh-keyscan -p 22 "${{ secrets.VM_SSH_HOST }}" >> ~/.ssh/known_hosts || { echo "ssh-keyscan failed"; exit 1; }
     
         echo "Testando conexão SSH com ${{ secrets.VM_SSH_HOST }}"
         ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new \
