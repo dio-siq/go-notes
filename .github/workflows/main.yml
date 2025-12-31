@@ -19,11 +19,19 @@ jobs:
       with:
         go-version: '1.22'
     
-    - name: Download dependencies
+    - name: Initialize Go module and install dependencies
       run: |
-        go mod download
-        go mod verify
-    
+        go mod init go-notes
+        
+        go get github.com/gofiber/fiber/v2
+        go get github.com/gofiber/template/html/v2
+        go get github.com/jackc/pgx/v5
+        go get golang.org/x/crypto/bcrypt
+        
+        go mod tidy
+        
+        go list -m all | head -20
+
     - name: Check go.mod tidiness
       run: |
         go mod tidy
@@ -31,10 +39,21 @@ jobs:
           (echo "go.mod/go.sum não está sincronizado!" && exit 1)
   
     - name: Build application
-      run: go build ./... 
-    
-    - name: Build binary
-      run: go build -o go-notes-app .
+      run: |
+        go build -o go-notes-app .
+        ls -lh go-notes-app
     
     - name: Run tests
       run: go test ./... 
+
+    - name: Save Go modules files
+      run: |
+        cat go.mod
+        head -10 go.sum
+    
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: go-notes-binary
+        path: go-notes-app
+        retention-days: 7
