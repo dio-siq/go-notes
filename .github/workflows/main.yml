@@ -52,7 +52,7 @@ jobs:
         head -10 go.sum
     
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: go-notes-binary
         path: go-notes-app
