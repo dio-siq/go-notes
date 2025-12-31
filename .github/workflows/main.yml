@@ -1,0 +1,40 @@
+name: Go CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+    
+    - name: Download dependencies
+      run: |
+        go mod download
+        go mod verify
+    
+    - name: Check go.mod tidiness
+      run: |
+        go mod tidy
+        git diff --exit-code go.mod go.sum || \
+          (echo "go.mod/go.sum não está sincronizado!" && exit 1)
+  
+    - name: Build application
+      run: go build ./... 
+    
+    - name: Build binary
+      run: go build -o go-notes-app .
+    
+    - name: Run tests
+      run: go test ./... 
