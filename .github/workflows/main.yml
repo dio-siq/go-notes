@@ -79,6 +79,9 @@ jobs:
         mkdir -p ~/.ssh
         echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+
+        echo "Host is: '${{ secrets.VM_HOST }}'"
+        echo "User is: '${{ secrets.VM_USER }}'"
     
         ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
     
