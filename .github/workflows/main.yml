@@ -44,7 +44,7 @@ jobs:
         ls -lh go-notes-app
     
     - name: Run tests
-      run: go test ./... 
+      run: go test ./ 
 
     - name: Save Go modules files
       run: |
@@ -57,3 +57,41 @@ jobs:
         name: go-notes-binary
         path: go-notes-app
         retention-days: 7
+
+  deploy:
+    runs-on: ubuntu-24.04
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - name: Download binary artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: go-notes-binary
+    
+    - name: List downloaded files
+      run: ls -la
+    
+    - name: Setup SSH for deployment
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+        SSH_HOST: ${{ secrets.VM_HOST }}
+        SSH_USER: ${{ secrets.VM_USER }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        
+        echo "Testando conexão SSH com $SSH_HOST"
+        ssh -o ConnectTimeout=10 $SSH_USER@$SSH_HOST "echo 'SSH connection successful'"
+    
+    - name: Deploy to VM
+      env:
+        SSH_HOST: ${{ secrets.VM_HOST }}
+        SSH_USER: ${{ secrets.VM_USER }}
+        APP_DIR: ${{ secrets.VM_APP_DIR }}
+      run: | 
+        echo "Executando script de deployment"
+        ssh $SSH_USER@$SSH_HOST "cd $APP_DIR && ./deploy.sh"
